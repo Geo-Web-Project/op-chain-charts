@@ -1,24 +1,3 @@
-# OP Helm Charts
-[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/op-charts)](https://artifacthub.io/packages/search?repo=op-charts)
+# OP Chain Helm Charts
 
-This repository contains helm charts for Optimism and Ethereum infrastructure.
-
-## What can I do with these charts?
-- You can build an OP Stack chain with a few lines of configurations.
-- You can run Optimism network node easily.
-
-## How can I add your repository?
-```shell
-helm repo add op-charts https://testinprod-io.github.io/op-charts/
-```
-
-## Why are you building this?
-We want to help you to onboard on the OP Stack!
-
-## Chart Index
-[here](https://testinprod-io.github.io/op-charts/index.yaml)
-
-## Thanks
-Thanks for OP Labs, Optimism Foundation, and Ethereum Foundation for building and open-sourcing this amazing collective and technology.
-
-_Let's stay Optimistic!_
+This repository contains helm charts for deploying a new OP Chain. It was originally forked from [op-charts](https://github.com/testinprod-io/op-charts), which is a great resource for deploying Optimism Network nodes. This project expands on this to specifically support deploying entirely new OP Chains.
