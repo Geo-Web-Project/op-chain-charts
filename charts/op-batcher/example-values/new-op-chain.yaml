@@ -1,0 +1,7 @@
+l1:
+  rpcAddr: # TODO: place the L1 RPC address including https:// or wss://
+
+l2:
+  batcherKey: # TODO: Batcher private key without 0x prefix
+  rpcAddr: # TODO: place your execution client's RPC address including https:// or wss://
+  rollupAddr: # TODO: place your op-node address including https:// or wss://

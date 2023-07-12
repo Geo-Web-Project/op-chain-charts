@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "op-batcher.fullname" . }}
+  labels:
+    {{- include "op-batcher.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: {{ .Values.rpc.port.name }}
+      port: {{ .Values.rpc.port.hostPort }}
+      targetPort: {{ .Values.rpc.port.containerPort }}
+
+  selector:
+    {{- include "op-batcher.selectorLabels" . | nindent 4 }}
