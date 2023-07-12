@@ -1,0 +1,7 @@
+l1:
+  rpcAddr: # TODO: place the L1 RPC address including https:// or wss://
+
+l2:
+  proposerKey: # TODO: Batcher private key without 0x prefix
+  rollupAddr: # TODO: place your op-node address including https:// or wss://
+  ooAddr: # TODO: The address of the L2OutputOracleProxy

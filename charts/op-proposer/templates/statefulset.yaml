@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "op-proposer.fullname" . }}
+  labels:
+    {{- include "op-proposer.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "op-proposer.fullname" . }}
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "op-proposer.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "op-proposer.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: {{ .Values.rpc.port.name }}
+              containerPort: {{ .Values.rpc.port.containerPort }}
+          command:
+            - op-proposer
+          args:
+          - --poll-interval={{ .Values.l2.pollInterval }}
+          - --rpc.port={{ .Values.rpc.port.containerPort }}
+          - --rollup-rpc={{ required "L2 Rollup Address is required." .Values.l2.rollupAddr }}
+          - --l2oo-address={{ .Values.l2.ooAddr }}
+          - --l1-eth-rpc={{ .Values.l1.rpcAddr }}
+
+            {{- with .Values.args }}
+            # Rest Arguments
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          env:
+            - name: OP_PROPOSER_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "op-proposer.secretname" . }}
+                  key: proposerKey
+          {{- if .Values.livenessProbe }}
+          livenessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 60
+            tcpSocket:
+              port: {{ .Values.rpc.port.name }}
+          {{- end }}
+          {{- if .Values.readinessProbe }}
+          readinessProbe:
+            # TODO: replace it to real http request.
+            initialDelaySeconds: 15
+            periodSeconds: 60
+            tcpSocket:
+              port: {{ .Values.rpc.port.name }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

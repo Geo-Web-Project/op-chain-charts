@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "op-proposer.fullname" . }}-test-connection"
+  labels:
+    {{- include "op-proposer.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "op-proposer.fullname" . }}:{{ .Values.rpc.port.containerPort }}']
+  restartPolicy: Never

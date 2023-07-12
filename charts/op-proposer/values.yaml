@@ -1,0 +1,54 @@
+replicaCount: 1
+
+image:
+  repository: us-docker.pkg.dev/oplabs-tools-artifacts/images/op-proposer
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: latest
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: LoadBalancer
+
+resources:
+  {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+livenessProbe: true
+readinessProbe: true
+
+l1:
+  rpcAddr: https://ethereum-goerli-rpc.allthatnode.com
+
+l2:
+  proposerKey:
+  rollupAddr:
+  pollInterval: "12s"
+  ooAddr:
+
+rpc:
+  port:
+    name: rpc-port
+    containerPort: 8560
+    hostPort: 8560
+  addr: 0.0.0.0
+
+# rest application arguments
+args: []
