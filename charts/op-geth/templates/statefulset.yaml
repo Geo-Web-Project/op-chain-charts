@@ -26,27 +26,49 @@ spec:
         volumeMounts:
         - name: {{ .Values.persistence.name }}
           mountPath: {{ .Values.persistence.mountDir }}
-      {{- if .Values.importTarURL }}
-      - name: import-chain
+      - name: import-signer-key
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         command: ["/bin/sh", "-c"]
         args:
           - |
-            if [ -f "{{ .Values.persistence.mountDir }}/imported" ]; then
-            echo "already imported"
+            if [ -f "{{ .Values.persistence.mountDir }}/init.import-signer-key.done" ]; then
+            echo "already initialized"
+            ls /root/data
+            else
+            echo "Signer key import start"
+            wget {{ .Values.genesis.url }} -O genesis.json
+            geth account import \
+              --datadir={{ .Values.persistence.mountDir }}{{ .Values.dataPath }} \
+              --password={{ .Values.secretForVolumeMountDir }}/{{ .Values.dataDirPassword.filename }} \
+              {{ .Values.secretForVolumeMountDir }}/{{ .Values.blockSignerKey.filename }}
+            touch {{ .Values.persistence.mountDir }}/init.import-signer-key.done
+            ls {{ .Values.persistence.mountDir }}{{ .Values.dataPath }}
+            echo "Signer Key import finished"
+            fi
+        volumeMounts:
+        - name: {{ .Values.persistence.name }}
+          mountPath: {{ .Values.persistence.mountDir }}
+        - name: {{ include "geth.secretname" . }}
+          mountPath: {{ .Values.secretForVolumeMountDir }} # mounts all files in the Secrets.  
+      {{- if .Values.genesis.importEnabled }}
+      - name: import-genesis
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            if [ -f "{{ .Values.persistence.mountDir }}/init.import-genesis.done" ]; then
+            echo "already initialized"
             ls /root/data
             else
             echo "Chain import start"
-            wget -O {{ .Values.persistence.mountDir }}/imported.tar {{ .Values.importTarURL }}  # download from URL
-            rm -rf {{ .Values.persistence.mountDir }}{{ .Values.dataPath }}  # clean dir
-            mkdir -p {{ .Values.persistence.mountDir }}{{ .Values.dataPath }}
-            tar -xf {{ .Values.persistence.mountDir }}/imported.tar -C {{ .Values.persistence.mountDir }}{{ .Values.dataPath }}/
-            rm -rf {{ .Values.persistence.mountDir }}/imported.tar
-            touch {{ .Values.persistence.mountDir }}/imported
+            wget {{ .Values.genesis.url }} -O genesis.json
+            geth init --datadir={{ .Values.persistence.mountDir }}{{ .Values.dataPath }} genesis.json
+            touch {{ .Values.persistence.mountDir }}/init.import-genesis.done
             ls {{ .Values.persistence.mountDir }}{{ .Values.dataPath }}
-            echo "Chain import finished"
+            echo "Genesis import finished"
             fi
-        image: busybox
-        imagePullPolicy: IfNotPresent
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         volumeMounts:
         - name: {{ .Values.persistence.name }}
           mountPath: {{ .Values.persistence.mountDir }}
@@ -83,16 +105,33 @@ spec:
             {{- end }}
           command: ["/usr/local/bin/geth"]
           args:
-            - --maxpeers={{ .Values.maxPeers }}
-            - --cache={{.Values.cache}}
-            - --syncmode={{.Values.syncMode}}
             - --datadir={{ .Values.persistence.mountDir }}{{ .Values.dataPath }}
+            - --syncmode={{.Values.syncMode}}
+            - --gcmode={{.Values.gcMode}}
+            - --maxpeers={{ .Values.maxPeers }}
+            - --rollup.disabletxpoolgossip={{ .Values.rollup.disableTxPoolGossip }}
+            - --password={{ .Values.secretForVolumeMountDir }}/{{ .Values.dataDirPassword.filename }}
+
+            {{- if .Values.allowInsecureUnlock }}
+            - --allow-insecure-unlock
+            {{- end }}
+
+            {{- if .Values.mine.enabled }}
+            - --mine
+            - --miner.etherbase={{ .Values.mine.sequencer }}
+            - --unlock={{ .Values.mine.sequencer }}
+            {{- end }}
+
+            {{- if .Values.noDiscover }}
+            - --nodiscover
+            {{- end }}
 
             {{- if .Values.rpc.http.enabled }}
             # HTTP RPC
             - --http
             - --http.api={{.Values.rpc.http.api}}
             - --http.addr={{ .Values.rpc.http.addr }}
+            - --http.vhosts={{ .Values.rpc.http.vhosts }}
             - --http.port={{ .Values.rpc.http.port.containerPort }}
             - --http.corsdomain={{ .Values.rpc.http.corsDomain }}
             {{- end }}
@@ -109,9 +148,6 @@ spec:
             {{- if .Values.networkID }}
             # network settings
             - --networkid={{ .Values.networkID }}
-            {{- end }}
-            {{- if and .Values.predefinedNetwork (ne .Values.predefinedNetwork "optimism-goerli ")}}
-            - --{{ .Values.predefinedNetwork }}
             {{- end }}
 
             {{- if .Values.authrpc.enabled }}
@@ -134,11 +170,6 @@ spec:
             - --metrics
             - --metrics.addr={{ .Values.metrics.addr }}
             - --metrics.port={{ .Values.metrics.port.containerPort }}
-            {{- end }}
-
-            {{- if .Values.importTarURL }}
-            # GC archive mode is required when we import the chain. Otherwise, imported data will be removed.
-            - --gcmode=archive
             {{- end }}
 
             {{- with .Values.args }}

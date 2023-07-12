@@ -1,0 +1,15 @@
+genesis:
+  importEnabled: true
+  url: # TODO: URL to genesis.json
+
+authrpc:
+  jwtSecret:
+    file: # TODO: place your execution client's jwtSecret here
+dataDirPassword:
+  file: # TODO: some password
+blockSignerKey:
+  file: # TODO: Sequencer private key
+
+mine:
+  enabled: true
+  sequencer: # TODO: Sequencer address

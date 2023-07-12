@@ -43,16 +43,17 @@ spec:
           args:
             # required values
             - --l1={{ .Values.l1.rpcAddr }}
+            - --l1.rpckind={{ .Values.l1.rpcKind }}
             - --l2={{ required "L2 Execution Engine Address is required." .Values.l2.rpcAddr }}
-            - --network={{ .Values.network }}
             - --rpc.addr={{ .Values.rpc.addr }}
             - --rpc.port={{ .Values.rpc.port.containerPort }}
             - --rpc.enable-admin={{ .Values.rpc.enableAdmin }}
-            - --snapshotlog.file={{ .Values.snapshotLogPath }}
+            - --sequencer.l1-confs={{ .Values.sequencer.l1Confirmations }}
+            - --verifier.l1-confs={{ .Values.verifier.l1Confirmations }}
 
-            {{- if .Values.rollupConfig.file }}
+            {{- if .Values.rollupConfig.filename }}
             # rollup config
-            - --rollup.config={{.Values.secretForVolumeMountDir}}/{{ .Values.rollupConfig.filename }}
+            - --rollup.config={{.Values.configmapsForVolumeMountDir}}/{{ .Values.rollupConfig.filename }}
             {{- end }}
 
             # jwt
@@ -63,7 +64,7 @@ spec:
             - --sequencer.enabled=true
             - --p2p.sequencer.key={{ .Values.sequencer.p2pKey }}
             {{- end }}
-
+            
             {{- if .Values.p2p.enabled }}
             # p2p
             - --p2p.disable=false
@@ -73,6 +74,8 @@ spec:
             {{- if .Values.p2p.priv.file }}
             - --p2p.priv.path={{ .Values.secretForVolumeMountDir }}/{{ .Values.p2p.priv.filename }}
             {{- end }}
+            {{- else }}
+            - --p2p.disable
             {{- end }}
 
             {{- if .Values.metrics.enabled }}
@@ -93,6 +96,8 @@ spec:
             # mounts all files in the Secrets.
             - mountPath: {{ .Values.secretForVolumeMountDir }}
               name: {{ include "op-node.secretname" . }}
+            - mountPath: {{ .Values.configmapsForVolumeMountDir }}
+              name: {{ include "op-node.configmapsname" . }}
           {{- if .Values.livenessProbe }}
           livenessProbe:
             initialDelaySeconds: 15
@@ -114,6 +119,9 @@ spec:
         - name: {{ include "op-node.secretname" . }}
           secret:
             secretName: {{ include "op-node.secretname" . }}
+        - name: {{ include "op-node.configmapsname" . }}
+          configMap:
+            name: {{ include "op-node.configmapsname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

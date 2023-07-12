@@ -14,7 +14,8 @@ fullnameOverride: ""
 service:
   type: LoadBalancer
 
-resources: {}
+resources:
+  {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -39,25 +40,31 @@ livenessProbe: true
 readinessProbe: true
 
 secretForVolumeMountDir: /secrets
+configmapsForVolumeMountDir: /configmaps
 
 l1:
   rpcAddr: https://ethereum-goerli-rpc.allthatnode.com
+  rpcKind: "basic"
 
 l2:
   rpcAddr:
   jwtSecret:
     file: # insert a file
-    filename: jwt-secret.txt  # file path to store jwtSecret
+    filename: jwt-secret.txt # file path to store jwtSecret
 
 sequencer:
-  enabled: false
+  enabled: true
+  l1Confirmations: 3
   p2pKey:
 
+verifier:
+  l1Confirmations: 3
+
 p2p:
-  enabled: true
+  enabled: false
   priv:
     file:
-    filename: p2ppriv.txt  # file path to store p2p.priv
+    filename: p2ppriv.txt # file path to store p2p.priv
   listen:
     ip: 0.0.0.0
     tcp:
@@ -69,21 +76,16 @@ p2p:
       containerPort: 9003
       hostPort: 9003
 
-snapshotLogPath: /logs
-
 rollupConfig:
-  file:
   filename: rollup.json
-
-network: goerli
 
 rpc:
   port:
     name: rpc-port
-    containerPort: 8545
-    hostPort: 7545
+    containerPort: 8547
+    hostPort: 8547
   addr: 0.0.0.0
-  enableAdmin: false
+  enableAdmin: true
 
 metrics:
   enabled: true

@@ -31,6 +31,13 @@ secret vault name
 {{- end }}
 
 {{/*
+configmap name
+*/}}
+{{- define "op-node.configmapsname" -}}
+{{ include "op-node.fullname" . }}-configmaps
+{{- end }}
+
+{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "op-node.chart" -}}
