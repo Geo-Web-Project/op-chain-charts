@@ -2,5 +2,5 @@ apiVersion: v2
 name: op-batcher
 description: OP Stack L2-Batch Submitter, submits bundles of batches to L1.
 type: application
-version: 0.1.1
+version: 0.1.2
 appVersion: "v0.10.13"

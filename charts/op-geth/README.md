@@ -1,45 +1,46 @@
-# Geth
-Geth is an execution engine for EVM network. This is a Geth Helm Chart packaged by Test in Prod.
+# Op Geth
+
+Geth is an execution engine for EVM network. This is a OP Geth Helm Chart forked from [Test in Prod](https://github.com/testinprod-io/op-charts/tree/main/charts/op-node) in order to support customization of OP Stack chains.
 
 ## Introduction
-You can use this chart for any EVM network including Optimism.
 
-Please refer to the example values for Optimism Goerli [here.](example-values/optimism-goerli.yaml)
+Please refer to the example values [here.](example-values/new-op-chain.yaml)
 
-## LFG
-`helm install geth-release op-charts/geth -f values.yaml`
+The default values were built according to the tutorial [here.](https://stack.optimism.io/docs/build/getting-started/)
+
+## Install
+
+`helm install op-geth-release op-chain-charts/op-geth -f values.yaml`
 
 ## Requirements
+
 1. K8s 1.8+
 2. Helm 3.2.0+
-3. OP Vibe 🎶
 
 ## Parameters
-**This chart connects to Ethereum Mainnet in default.** Please refer to the [Geth flag docs](https://geth.ethereum.org/docs/fundamentals/command-line-options) for the detail!
-### Geth Parameters
-| Name                     | Description                                                                                                  | Value                                                                |
-|--------------------------|--------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
-| `predefinedNetwork`      | Pre-defined application config set. Choices are `mainnet`, `optimism-goerli`, `goerli`, `sepolia`, or blank. | `mainnet`                                                            |
-| `rpc.http.enabled`       | HTTP RPC switch                                                                                              | `true`                                                               |
-| `rpc.http.api`           | API list for HTTP RPC                                                                                        | `"net,eth,personal,web3,debug,engine,txpool"`                        |
-| `rpc.ws.enabled`         | WS RPC switch                                                                                                | `true`                                                               |
-| `rpc.ws.api`             | API list for WS RPC                                                                                          | `"net,eth,personal,web3,engine,txpool"`                              |
-| `authrpc.enabled`        | Auth RPC switch                                                                                              | `true`                                                               |
-| `authrpc.jwtSecret.file` | JWT Secret key for Auth RPC. **PLEASE change this value** if you are going to use AuthRPC.                   | `"abf3a433bfe1f8faa262ad82b3ec5fa572e9c045a4c44bd3b21998e77fd3632a"` |
-| `pprof.enabled`          | pprof switch                                                                                                 | `true`                                                               |
-| `metrics.enabled`        | metrics switch                                                                                               | `true`                                                               |
-| `dataPath`               | Path for the Geth DB.                                                                                        | `"/data"`                                                            |
-| `importTarURL`           | You can import an entire Geth DB of this URL. `.tar` file should contain `geth` directory on the top.        | `""`                                                                 |
-| `networkID`              | Network ID                                                                                                   | `1`                                                                  |
-| `maxPeers`               | Max list of peers.                                                                                           | `50`                                                                 |
-| `syncMode`               | Method for syncing. Choices are `snap` and `full`.                                                           | `"snap"`                                                             |
-| `cache`                  | Memory size for the application. 4096MB is recommended for the mainnet.                                      | `4096`                                                               |
-| `args`                   | Other application arguments for op-node                                                                      | `[]`                                                                 |
 
+### Op Geth Parameters
+
+| Name                     | Description                                                                                | Value                                                                |
+| ------------------------ | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| `rpc.http.enabled`       | HTTP RPC switch                                                                            | `true`                                                               |
+| `rpc.http.api`           | API list for HTTP RPC                                                                      | `"net,eth,personal,web3,debug,engine,txpool"`                        |
+| `rpc.ws.enabled`         | WS RPC switch                                                                              | `true`                                                               |
+| `rpc.ws.api`             | API list for WS RPC                                                                        | `"net,eth,personal,web3,engine,txpool"`                              |
+| `authrpc.enabled`        | Auth RPC switch                                                                            | `true`                                                               |
+| `authrpc.jwtSecret.file` | JWT Secret key for Auth RPC. **PLEASE change this value** if you are going to use AuthRPC. | `"abf3a433bfe1f8faa262ad82b3ec5fa572e9c045a4c44bd3b21998e77fd3632a"` |
+| `pprof.enabled`          | pprof switch                                                                               | `true`                                                               |
+| `metrics.enabled`        | metrics switch                                                                             | `true`                                                               |
+| `dataPath`               | Path for the Geth DB.                                                                      | `"/data"`                                                            |
+| `networkID`              | Network ID                                                                                 | `1`                                                                  |
+| `maxPeers`               | Max list of peers.                                                                         | `50`                                                                 |
+| `syncMode`               | Method for syncing. Choices are `snap` and `full`.                                         | `"snap"`                                                             |
+| `args`                   | Other application arguments for op-node                                                    | `[]`                                                                 |
 
 ### Deployment Parameters
+
 | Name                          | Description                                                                          | Value     |
-|-------------------------------|--------------------------------------------------------------------------------------|-----------|
+| ----------------------------- | ------------------------------------------------------------------------------------ | --------- |
 | `replicaCount`                | Number of op-node replicas to deploy                                                 | 1         |
 | `livenessProbe`               | livenessProbe switch for op-node                                                     | `true`    |
 | `readinessProbe`              | readinessProbe switch for op-node                                                    | `true`    |
@@ -61,8 +62,9 @@ Please refer to the example values for Optimism Goerli [here.](example-values/op
 | `persistence.size`            | persistence disk size. Recommending 2TB+ for mainnet and 200GB+ for Optimism Goerli. | `200Gi`   |
 
 ### Common Parameters
+
 | Name               | Description                                              | Value            |
-|--------------------|----------------------------------------------------------|------------------|
+| ------------------ | -------------------------------------------------------- | ---------------- |
 | `fullnameOverride` | String to fully override op-node.fullname template       | `""`             |
 | `nameOverride`     | String to fully override op-node.name                    | `""`             |
 | `service.type`     | Service type                                             | `"LoadBalancer"` |
@@ -70,7 +72,3 @@ Please refer to the example values for Optimism Goerli [here.](example-values/op
 | `nodeSelector`     | Node labels for pod assignment. Evaluated as a template. | `{}`             |
 | `tolerations`      | Tolerations for pod assignment. Evaluated as a template. | `[]`             |
 | `affinity`         | Affinity for pod assignment                              | `{}`             |
-
-## Kudos
-- Kudos to Bitnami and Dysnix for providing decent template references.
-- Of course, thanks Ethereum Foundation, OP Labs, and Optimism Foundation for building an amazing technology.
