@@ -9,3 +9,7 @@ This repository contains helm charts for deploying a new OP Chain. It was origin
 ```
 helm repo add op-chain-charts https://geo-web-project.github.io/op-chain-charts/
 ```
+
+## Helmfile Example
+
+An example Helmfile for deploying all these components together can be found [here](./example/).
