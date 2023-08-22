@@ -1,0 +1,9 @@
+l1:
+  rpcAddr:
+  rpcKind:
+l2:
+  ooAddr:
+  proposerKey:
+  rollupAddr: http://op-node:8547
+service:
+  type: ClusterIP

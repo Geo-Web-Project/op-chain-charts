@@ -1,0 +1,22 @@
+authrpc:
+  jwtSecret:
+    file:
+blockSignerKey:
+  file:
+dataDirPassword:
+  file:
+genesis:
+  importEnabled: true
+  url: # HTTP url to genesis.json
+image:
+  repository: registry.digitalocean.com/geo-web/op-geth
+  tag: v1.101106.0
+networkID: 420691
+mine:
+  enabled: true
+  sequencer: # Sequencer address
+resources:
+  limits:
+    memory: 3Gi
+  requests:
+    memory: 3Gi
