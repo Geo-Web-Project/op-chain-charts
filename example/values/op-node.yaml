@@ -1,0 +1,14 @@
+l1:
+  rpcAddr:
+  rpcKind:
+l2:
+  jwtSecret:
+    file:
+  rpcAddr: http://op-geth:8551
+service:
+  type: ClusterIP
+resources:
+  limits:
+    memory: 2Gi
+  requests:
+    memory: 2Gi

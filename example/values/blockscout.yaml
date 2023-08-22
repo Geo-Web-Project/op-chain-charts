@@ -1,0 +1,7 @@
+config:
+  ETHEREUM_JSONRPC_HTTP_URL: http://op-geth:8545
+image:
+  repository: blockscout/blockscout-optimism
+  tag: latest
+service:
+  type: LoadBalancer

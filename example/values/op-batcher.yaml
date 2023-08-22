@@ -1,0 +1,10 @@
+l1:
+  rpcAddr: wss://eth-goerli.g.alchemy.com/v2/QiBpjcoIrfbGMBUNvL21lgSV7npPqfhp
+  rpcKind: alchemy
+l2:
+  batcherKey: 3ae98ef82f92a374c06b9483e31d385fcceee2356e99f205c3c007e4bd1fead9
+  rollupAddr: http://op-node:8547
+  rpcAddr: http://op-geth:8545
+  maxChannelDuration: 0
+service:
+  type: ClusterIP

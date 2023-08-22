@@ -1,0 +1,47 @@
+repositories:
+  - name: op-chain-charts
+    url: https://geo-web-project.github.io/op-chain-charts/
+  - name: main
+    url: https://bedag.github.io/helm-charts/
+  - name: ethereum-helm-charts
+    url: https://ethpandaops.github.io/ethereum-helm-charts
+
+releases:
+  - name: op-geth
+    namespace: op-stack-goerli
+    chart: op-chain-charts/op-geth
+    values:
+      - ./values/op-geth.yaml
+  - name: op-node
+    namespace: op-stack-goerli
+    chart: op-chain-charts/op-node
+    values:
+      - ./values/op-node.yaml
+  - name: op-proposer
+    namespace: op-stack-goerli
+    chart: op-chain-charts/op-proposer
+    values:
+      - ./values/op-proposer.yaml
+  - name: op-batcher
+    namespace: op-stack-goerli
+    chart: op-chain-charts/op-batcher
+    values:
+      - ./values/op-batcher.yaml
+  - name: blockscout
+    namespace: op-stack-goerli
+    chart: ethereum-helm-charts/blockscout
+    values:
+      - ./values/blockscout.yaml
+  - name: op-node-configmaps
+    namespace: op-stack-goerli
+    chart: main/raw
+    values:
+      - templates:
+          - |
+            apiVersion: v1
+            kind: ConfigMap
+            metadata:
+              name: op-node-configmaps
+            data:
+              rollup.json: |
+                {}
