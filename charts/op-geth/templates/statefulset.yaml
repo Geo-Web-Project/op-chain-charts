@@ -72,6 +72,32 @@ spec:
         volumeMounts:
         - name: {{ .Values.persistence.name }}
           mountPath: {{ .Values.persistence.mountDir }}
+      {{- else }}
+      - name: generate-genesis
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            if [ -f "{{ .Values.persistence.mountDir }}/init.import-genesis.done" ]; then
+            echo "already initialized"
+            ls /root/data
+            else
+            echo "Chain import start"
+            go run cmd/main.go genesis l2 \
+              --deploy-config ../packages/contracts-bedrock/deploy-config/getting-started.json \
+              --deployment-dir ../packages/contracts-bedrock/deployments/getting-started/ \
+              --outfile.l2 genesis.json \
+              --outfile.rollup rollup.json \
+              --l1-rpc <RPC>
+            geth init --datadir={{ .Values.persistence.mountDir }}{{ .Values.dataPath }} genesis.json
+            touch {{ .Values.persistence.mountDir }}/init.import-genesis.done
+            ls {{ .Values.persistence.mountDir }}{{ .Values.dataPath }}
+            echo "Genesis import finished"
+            fi
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        volumeMounts:
+        - name: {{ .Values.persistence.name }}
+          mountPath: {{ .Values.persistence.mountDir }}
       {{- end }}
       containers:
         - name: {{ template "geth.fullname" . }}
@@ -194,8 +220,8 @@ spec:
           volumeMounts:
           - name: {{ .Values.persistence.name }}
             mountPath: {{ .Values.persistence.mountDir }}
-          - mountPath: {{ .Values.secretForVolumeMountDir }} # mounts all files in the Secrets.
-            name: {{ include "geth.secretname" . }}
+          - name: {{ include "geth.secretname" . }}
+            mountPath: {{ .Values.secretForVolumeMountDir }} # mounts all files in the Secrets.
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:

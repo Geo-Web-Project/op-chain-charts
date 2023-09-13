@@ -32,16 +32,3 @@ releases:
     chart: ethereum-helm-charts/blockscout
     values:
       - ./values/blockscout.yaml
-  - name: op-node-configmaps
-    namespace: op-stack-goerli
-    chart: main/raw
-    values:
-      - templates:
-          - |
-            apiVersion: v1
-            kind: ConfigMap
-            metadata:
-              name: op-node-configmaps
-            data:
-              rollup.json: |
-                {}
